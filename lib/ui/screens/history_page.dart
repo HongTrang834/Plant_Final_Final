@@ -25,13 +25,13 @@ class _HistoryPageState extends State<HistoryPage> {
                 children: [
                   SizedBox(
                     height: 100,
-                    child: Image.asset('assets/images/favorited.png'),
+                    //      child: Image.asset('assets/images/favorited.png'),
                   ),
                   const SizedBox(
                     height: 10,
                   ),
                   Text(
-                    'Your searched Plants',
+                    'Your history searched plants',
                     style: TextStyle(
                       color: Constants.primaryColor,
                       fontWeight: FontWeight.w300,
