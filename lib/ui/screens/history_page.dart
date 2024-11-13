@@ -29,7 +29,6 @@ class _HistoryPageState extends State<HistoryPage> {
                   ),
                   const SizedBox(
                     height: 10,
-                    width: 20,
                   ),
                   Text(
                     'Your history searched plants',
@@ -37,7 +36,6 @@ class _HistoryPageState extends State<HistoryPage> {
                       color: Constants.primaryColor,
                       fontWeight: FontWeight.w300,
                       fontSize: 18,
-                      fontFamily: String,
                     ),
                   ),
                 ],

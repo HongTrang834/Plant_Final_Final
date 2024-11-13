@@ -30,7 +30,7 @@ class _RootPageState extends State<RootPage> {
       FavoritePage(
         favoritedPlants: favorites,
       ),
-      HistoryPage(),
+      //HistoryPage(historyPlants: [],),
       const ProfilePage(),
     ];
   }
