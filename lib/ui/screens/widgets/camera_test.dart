@@ -1,15 +1,15 @@
+import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:gal/gal.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class CameraTest extends StatefulWidget {
+  const CameraTest({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<CameraTest> createState() => _CameraTestState();
 }
 
-class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+class _CameraTestState extends State<CameraTest> with WidgetsBindingObserver {
   List<CameraDescription> cameras = [];
   CameraController? cameraController;
 
@@ -55,21 +55,44 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(
-              height: MediaQuery.sizeOf(context).height * 0.30,
-              width: MediaQuery.sizeOf(context).width * 0.80,
+              height: MediaQuery.of(context).size.height * 0.30,
+              width: MediaQuery.of(context).size.width * 0.80,
               child: CameraPreview(
                 cameraController!,
               ),
             ),
             IconButton(
               onPressed: () async {
-                XFile picture = await cameraController!.takePicture();
-                Gal.putImage(
-                  picture.path,
-                );
+                try {
+                  if (cameraController != null &&
+                      cameraController!.value.isInitialized) {
+                    XFile picture = await cameraController!.takePicture();
+                    print("Picture taken: ${picture.path}");
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text("Picture Captured"),
+                        content: Image.file(
+                          File(picture.path),
+                          fit: BoxFit.cover,
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text("OK"),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    print("Camera is not initialized");
+                  }
+                } catch (e) {
+                  print("Error taking picture: $e");
+                }
               },
               iconSize: 100,
-              icon: const Icon(
+              icon: Icon(
                 Icons.camera,
                 color: Colors.red,
               ),
@@ -81,25 +104,24 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _setupCameraController() async {
-    List<CameraDescription> _cameras = await availableCameras();
-    if (_cameras.isNotEmpty) {
-      setState(() {
-        cameras = _cameras;
-        cameraController = CameraController(
-          _cameras.last,
-          ResolutionPreset.high,
-        );
-      });
-      cameraController?.initialize().then((_) {
-        if (!mounted) {
-          return;
-        }
+    try {
+      List<CameraDescription> _cameras = await availableCameras();
+      if (_cameras.isNotEmpty) {
+        setState(() {
+          cameras = _cameras;
+          cameraController = CameraController(
+            _cameras.first,
+            ResolutionPreset.medium, // Use medium for better compatibility
+          );
+        });
+
+        await cameraController?.initialize();
         setState(() {});
-      }).catchError(
-        (Object e) {
-          print(e);
-        },
-      );
+      } else {
+        print("No cameras found");
+      }
+    } catch (e) {
+      print("Error setting up camera: $e");
     }
   }
 }
