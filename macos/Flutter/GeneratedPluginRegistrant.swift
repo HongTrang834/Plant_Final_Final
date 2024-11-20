@@ -5,10 +5,8 @@
 import FlutterMacOS
 import Foundation
 
-import video_player_avfoundation
-import webview_flutter_wkwebview
+import gal
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
-  FVPVideoPlayerPlugin.register(with: registry.registrar(forPlugin: "FVPVideoPlayerPlugin"))
-  FLTWebViewFlutterPlugin.register(with: registry.registrar(forPlugin: "FLTWebViewFlutterPlugin"))
+  GalPlugin.register(with: registry.registrar(forPlugin: "GalPlugin"))
 }

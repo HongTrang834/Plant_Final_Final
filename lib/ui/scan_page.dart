@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plant/constants.dart';
-import 'package:plant/ui/screens/widgets/video_player_page.dart';
-import 'package:plant/ui/screens/widgets/video_player_page.dart';
+import 'package:plant/ui/root_page.dart';
+import 'package:plant/ui/screens/widgets/camera_test.dart';
 
 class ScanPage extends StatefulWidget {
   const ScanPage({Key? key}) : super(key: key);
@@ -90,8 +90,7 @@ class _ScanPageState extends State<ScanPage> {
                         // Điều hướng đến trang phát video
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => VideoPlayerPage()),
+                          MaterialPageRoute(builder: (context) => CameraTest()),
                         );
                       },
                       child: Text(
