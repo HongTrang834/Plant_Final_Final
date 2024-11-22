@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:plant/ui/screens/widgets/identifiy_plant_screen.dart';
 
 class CameraTest extends StatefulWidget {
   const CameraTest({super.key});
@@ -23,8 +24,9 @@ class _CameraTestState extends State<CameraTest> with WidgetsBindingObserver {
 
     if (state == AppLifecycleState.inactive) {
       cameraController?.dispose();
+      cameraController = null; // Nullify after disposal
     } else if (state == AppLifecycleState.resumed) {
-      _setupCameraController();
+      _setupCameraController(); // Reinitialize safely
     }
   }
 
@@ -32,6 +34,12 @@ class _CameraTestState extends State<CameraTest> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     _setupCameraController();
+  }
+
+  @override
+  void dispose() {
+    cameraController?.dispose(); // Dispose controller on widget destruction
+    super.dispose();
   }
 
   @override
@@ -67,21 +75,14 @@ class _CameraTestState extends State<CameraTest> with WidgetsBindingObserver {
                   if (cameraController != null &&
                       cameraController!.value.isInitialized) {
                     XFile picture = await cameraController!.takePicture();
+
+                    // Save the image and proceed to identification
                     print("Picture taken: ${picture.path}");
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text("Picture Captured"),
-                        content: Image.file(
-                          File(picture.path),
-                          fit: BoxFit.cover,
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text("OK"),
-                          ),
-                        ],
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            IdentifyPlantScreen(imagePath: picture.path),
                       ),
                     );
                   } else {
@@ -96,7 +97,7 @@ class _CameraTestState extends State<CameraTest> with WidgetsBindingObserver {
                 Icons.camera,
                 color: Colors.red,
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -111,7 +112,7 @@ class _CameraTestState extends State<CameraTest> with WidgetsBindingObserver {
           cameras = _cameras;
           cameraController = CameraController(
             _cameras.first,
-            ResolutionPreset.medium, // Use medium for better compatibility
+            ResolutionPreset.medium,
           );
         });
 
@@ -122,6 +123,29 @@ class _CameraTestState extends State<CameraTest> with WidgetsBindingObserver {
       }
     } catch (e) {
       print("Error setting up camera: $e");
+    }
+  }
+
+  /// Saves the image to the gallery and returns the new file path
+  Future<String> _saveImageToGallery(XFile picture) async {
+    try {
+      // Use the media store to save the image in the phone's gallery
+      final directory = Directory("/storage/emulated/0/DCIM/Camera");
+
+      if (!directory.existsSync()) {
+        directory.createSync(recursive: true);
+      }
+
+      final newFilePath =
+          "${directory.path}/plant_${DateTime.now().millisecondsSinceEpoch}.jpg";
+
+      // Copy the file to the gallery directory
+      final newFile = await File(picture.path).copy(newFilePath);
+
+      return newFilePath;
+    } catch (e) {
+      print("Error saving image to gallery: $e");
+      rethrow;
     }
   }
 }
