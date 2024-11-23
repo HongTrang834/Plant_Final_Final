@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 class IdentifyPlantScreen extends StatelessWidget {
   final String imagePath;
-
+  final String raspberryPiUrl = "http://10.10.82.139:5001/receive_image";
   const IdentifyPlantScreen({super.key, required this.imagePath});
 
   @override
@@ -29,9 +29,9 @@ class IdentifyPlantScreen extends StatelessWidget {
   }
 
   Future<void> _identifyPlant(String imagePath) async {
-    const String apiUrl = 'https://plant.id/api/v3'; // Correct endpoint
-    const String apiKey =
-        'GFEsndnmxGkkMesR2QhSl0V1UW8PNree1s4K18jREN0JlW1Vxy'; // Replace with your API key
+    //const String apiUrl = 'https://plant.id/api/v3'; // Correct endpoint
+    // const String apiKey =
+    //     'GFEsndnmxGkkMesR2QhSl0V1UW8PNree1s4K18jREN0JlW1Vxy';
 
     try {
       if (!File(imagePath).existsSync()) {
@@ -39,24 +39,22 @@ class IdentifyPlantScreen extends StatelessWidget {
         return;
       }
 
-      var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
-      request.headers['Authorization'] = 'Bearer $apiKey';
-      request.files.add(await http.MultipartFile.fromPath('images', imagePath));
-      request.fields['include-related-images'] = 'false';
-      request.fields['organs'] = 'leaf'; // Optional: specify organ type
+      var request = http.MultipartRequest('POST', Uri.parse(raspberryPiUrl));
+      // request.headers['Authorization'] = 'Bearer $apiKey';
+      // request.files.add(await http.MultipartFile.fromPath('images', imagePath));
+      // request.fields['include-related-images'] = 'false';
+      // request.fields['organs'] = 'leaf'; // Optional: specify organ type
 
-      print("Sending request to $apiUrl...");
+      print("Sending request to $raspberryPiUrl...");
       var response = await request.send();
 
       if (response.statusCode == 200) {
-        var responseBody = await response.stream.bytesToString();
-        var jsonResponse = json.decode(responseBody);
-        String plantName = jsonResponse['suggestions'][0]['plant_name'];
-        double confidence = jsonResponse['suggestions'][0]['probability'];
-        print(
-            'Plant identified: $plantName with ${(confidence * 100).toStringAsFixed(2)}% confidence');
+        var responseData = await response.stream.bytesToString();
+        var result = json.decode(responseData);
+        String _resultMessage = "Prediction: ${result['predicted_name']}";
+        print(_resultMessage);
       } else {
-        print("Request URL: $apiUrl");
+        print("Request URL: $raspberryPiUrl");
         print("Headers: ${request.headers}");
         print("Fields: ${request.fields}");
         print("Files: ${request.files}");
