@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:plant/constants.dart';
 import 'package:plant/ui/root_page.dart';
-import 'package:plant/ui/screens/widgets/camera_test.dart';
+
+import 'screens/widgets/camera_test.dart';
+
 
 class ScanPage extends StatefulWidget {
   const ScanPage({Key? key}) : super(key: key);
