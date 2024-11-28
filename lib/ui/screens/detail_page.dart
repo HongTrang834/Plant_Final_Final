@@ -16,123 +16,66 @@ class _DetailPageState extends State<DetailPage> {
     return !isFavorited;
   }
 
-  //Toggle add remove from cart
-  bool toggleIsSelected(bool isSelected) {
-    return !isSelected;
-  }
-
+  @override
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     List<Plant> _plantList = Plant.plantList;
+    Plant currentPlant = _plantList[widget.plantId];
+
     return Scaffold(
       body: Stack(
         children: [
+          // Hình ảnh chính ở trên
           Positioned(
             top: 50,
-            left: 20,
-            right: 20,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            left: 0,
+            right: 0,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      color: Constants.primaryColor.withOpacity(.15),
-                    ),
-                    child: Icon(
-                      Icons.close,
-                      color: Constants.primaryColor,
+                // Ảnh chính
+                Container(
+                  width: 250,
+                  height: 250,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: ClipOval(
+                    child: Image.asset(
+                      currentPlant.imageURL,
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
-                GestureDetector(
-                  onTap: () {
-                    debugPrint('favorite');
-                  },
-                  child: Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      color: Constants.primaryColor.withOpacity(.15),
-                    ),
-                    child: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            bool isFavorited = toggleIsFavorated(
-                                _plantList[widget.plantId].isFavorated);
-                            _plantList[widget.plantId].isFavorated =
-                                isFavorited;
-                          });
-                        },
-                        icon: Icon(
-                          _plantList[widget.plantId].isFavorated == true
-                              ? Icons.favorite
-                              : Icons.favorite_border,
-                          color: Constants.primaryColor,
-                        )),
+                const SizedBox(
+                    height: 10), // Khoảng cách giữa ảnh chính và ảnh phụ
+                // List các ảnh phụ
+                SizedBox(
+                  height: 110,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: 4,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.asset(
+                            currentPlant.relatedImages[index],
+                            width: 80,
+                            height: 80,
+                            //  fit: BoxFit.cover,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
             ),
           ),
-          Positioned(
-            top: 100,
-            left: 20,
-            right: 20,
-            child: Container(
-              width: size.width * .8,
-              height: size.height * .8,
-              padding: const EdgeInsets.all(20),
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: 10,
-                    left: 0,
-                    child: SizedBox(
-                      height: 300,
-                      child: Image.asset(_plantList[widget.plantId].imageURL),
-                    ),
-                  ),
-                  Positioned(
-                    top: 10,
-                    right: 0,
-                    child: SizedBox(
-                      // height chi kich thuoc cho 3 phan size, humidity vaf temp
-                      // height: 300,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          PlantFeature(
-                            title: 'Size',
-                            plantFeature: _plantList[widget.plantId].size,
-                          ),
-                          PlantFeature(
-                            title: 'Humidity',
-                            plantFeature:
-                                _plantList[widget.plantId].humidity.toString(),
-                          ),
-                          PlantFeature(
-                            title: 'Temperature',
-                            plantFeature:
-                                _plantList[widget.plantId].temperature,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          // Nội dung chính
           Positioned(
             bottom: 0,
             left: 0,
@@ -151,56 +94,60 @@ class _DetailPageState extends State<DetailPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        // hien ten cay
-                        children: [
-                          Text(
-                            _plantList[widget.plantId].plantName,
-                            style: TextStyle(
-                              color: Constants.primaryColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 30.0,
-                            ),
-                          ),
-                          // const SizedBox(
-                          //   height: 10,
-                          // ),
-                        ],
+                      // Hiển thị tên cây
+                      Text(
+                        currentPlant.plantName,
+                        style: TextStyle(
+                          color: Constants.primaryColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 30.0,
+                        ),
                       ),
-                      // Row(
-                      //   children: [
-                      //     Text(
-                      //       _plantList[widget.plantId].rating.toString(),
-                      //       style: TextStyle(
-                      //         fontSize: 30.0,
-                      //         color: Constants.primaryColor,
-                      //       ),
-                      //     ),
-                      //     Icon(
-                      //       Icons.star,
-                      //       size: 30.0,
-                      //       color: Constants.primaryColor,
-                      //     ),
-                      //   ],
-                      // ),
+                      // Hiển thị tên khoa học
+                      Text(
+                        currentPlant.plantScientificName,
+                        style: TextStyle(
+                          color: Constants.primaryColor.withOpacity(0.8),
+                          fontSize: 18.0,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // Hiển thị vùng phân bố
+                      Text(
+                        "Area: " + currentPlant.plantArea,
+                        style: TextStyle(
+                          color: Constants.blackColor,
+                          fontSize: 16.0,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // Hiển thị thành phần hóa học
+                      Text(
+                        "Chemical Composition: " +
+                            currentPlant.plantChemiscalCom,
+                        style: TextStyle(
+                          color: Constants.blackColor,
+                          fontSize: 16.0,
+                          height: 1.5,
+                        ),
+                      ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 5.0,
-                  ),
+                  const SizedBox(height: 10.0),
                   Expanded(
-                    child: Text(
-                      _plantList[widget.plantId].decription,
-                      textAlign: TextAlign.justify,
-                      style: TextStyle(
-                        height: 1.5,
-                        fontSize: 18,
-                        color: Constants.blackColor.withOpacity(.7),
+                    child: SingleChildScrollView(
+                      child: Text(
+                        currentPlant.decription,
+                        textAlign: TextAlign.justify,
+                        style: TextStyle(
+                          height: 1.5,
+                          fontSize: 18,
+                          color: Constants.blackColor.withOpacity(.7),
+                        ),
                       ),
                     ),
                   ),
@@ -212,39 +159,56 @@ class _DetailPageState extends State<DetailPage> {
       ),
       floatingActionButton: SizedBox(
         width: size.width,
-        height: 50,
-        child: Row(
+        height: 150,
+        child: Column(
           children: [
-            // Container(
-            //   height: 50,
-            //   width: 50,
-            // ),
-            SizedBox(
-              width: size.width * .05,
-            ),
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                    color: Constants.primaryColor,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        offset: const Offset(0, 1),
-                        blurRadius: 5,
-                        color: Constants.primaryColor.withOpacity(.3),
-                      )
-                    ]),
-                child: Center(
-                  child: Text(
-                    'Learn more about ' + _plantList[widget.plantId].plantName,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20.0,
-                    ),
+            // Nút Learn more
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20.0),
+              decoration: BoxDecoration(
+                color: Constants.primaryColor,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    offset: const Offset(0, 1),
+                    blurRadius: 5,
+                    color: Constants.primaryColor.withOpacity(.3),
+                  )
+                ],
+              ),
+              child: Center(
+                child: Text(
+                  'Learn more about ' + currentPlant.plantName,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20.0,
                   ),
                 ),
               ),
             ),
+            const SizedBox(height: 10),
+            // 4 hình ảnh liên quan
+            // SizedBox(
+            //   height: 80,
+            //   child: ListView.builder(
+            //     scrollDirection: Axis.horizontal,
+            //     itemCount: 4,
+            //     itemBuilder: (context, index) {
+            //       return Padding(
+            //         padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            //         child: ClipRRect(
+            //           borderRadius: BorderRadius.circular(10),
+            //           child: Image.asset(
+            //             currentPlant.relatedImages[index],
+            //             width: 80,
+            //             height: 80,
+            //             fit: BoxFit.cover,
+            //           ),
+            //         ),
+            //       );
+            //     },
+            //   ),
+            // ),
           ],
         ),
       ),

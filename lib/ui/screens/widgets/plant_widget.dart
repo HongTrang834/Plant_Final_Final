@@ -68,7 +68,6 @@ class PlantWidget extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(plantList[index].category),
                       Text(
                         plantList[index].plantName,
                         style: TextStyle(

@@ -180,13 +180,13 @@ class _HomePageState extends State<HomePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  _plantList[index].category,
-                                  style: const TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 16,
-                                  ),
-                                ),
+                                // Text(
+                                //   _plantList[index].category,
+                                //   style: const TextStyle(
+                                //     color: Colors.white70,
+                                //     fontSize: 16,
+                                //   ),
+                                // ),
                                 // chu ten cay theo hang ngang
                                 Text(
                                   _plantList[index].plantName,

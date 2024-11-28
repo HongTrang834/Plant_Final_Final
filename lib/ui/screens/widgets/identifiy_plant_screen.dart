@@ -5,7 +5,9 @@ import 'package:http/http.dart' as http;
 
 class IdentifyPlantScreen extends StatelessWidget {
   final String imagePath;
-  final String raspberryPiUrl = "http://10.10.82.139:5001/receive_image";
+  final String raspberryPiUrl =
+      "http://10.10.82.139:5001/receive_image"; // URL của server Raspberry Pi
+
   const IdentifyPlantScreen({super.key, required this.imagePath});
 
   @override
@@ -15,24 +17,21 @@ class IdentifyPlantScreen extends StatelessWidget {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.file(File(imagePath)), // Display the captured image
+          Image.file(File(imagePath)), // Hiển thị ảnh đã chụp
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () async {
-              await _identifyPlant(imagePath); // Pass the captured image's path
+              await _uploadImage(imagePath); // Gọi hàm upload ảnh khi nhấn nút
             },
-            child: const Text("Identify Plant"),
+            child: const Text("Upload Image"),
           ),
         ],
       ),
     );
   }
 
-  Future<void> _identifyPlant(String imagePath) async {
-    //const String apiUrl = 'https://plant.id/api/v3'; // Correct endpoint
-    // const String apiKey =
-    //     'GFEsndnmxGkkMesR2QhSl0V1UW8PNree1s4K18jREN0JlW1Vxy';
-
+  // Hàm upload ảnh lên server Raspberry Pi
+  Future<void> _uploadImage(String imagePath) async {
     try {
       if (!File(imagePath).existsSync()) {
         print("File does not exist at path: $imagePath");
@@ -40,26 +39,22 @@ class IdentifyPlantScreen extends StatelessWidget {
       }
 
       var request = http.MultipartRequest('POST', Uri.parse(raspberryPiUrl));
-      // request.headers['Authorization'] = 'Bearer $apiKey';
-      // request.files.add(await http.MultipartFile.fromPath('images', imagePath));
-      // request.fields['include-related-images'] = 'false';
-      // request.fields['organs'] = 'leaf'; // Optional: specify organ type
+
+      // Thêm file ảnh vào request
+      request.files.add(await http.MultipartFile.fromPath('image', imagePath));
 
       print("Sending request to $raspberryPiUrl...");
       var response = await request.send();
 
       if (response.statusCode == 200) {
-        var responseData = await response.stream.bytesToString();
-        var result = json.decode(responseData);
-        String _resultMessage = "Prediction: ${result['predicted_name']}";
-        print(_resultMessage);
+        // var responseData = await response.stream.bytesToString();
+        // var result = json.decode(responseData);
+        // String _resultMessage = "Prediction: ${result['predicted_name']}";
+        // print(_resultMessage); // Hiển thị kết quả nhận diện
+        print("ok");
       } else {
         print("Request URL: $raspberryPiUrl");
-        print("Headers: ${request.headers}");
-        print("Fields: ${request.fields}");
-        print("Files: ${request.files}");
-
-        print('Failed to identify plant. Error: ${response.statusCode}');
+        print('Error: ${response.statusCode}');
         var errorDetails = await response.stream.bytesToString();
         print('Error Details: $errorDetails');
       }
