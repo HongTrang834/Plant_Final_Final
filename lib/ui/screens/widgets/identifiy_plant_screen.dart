@@ -40,18 +40,19 @@ class IdentifyPlantScreen extends StatelessWidget {
 
       var request = http.MultipartRequest('POST', Uri.parse(raspberryPiUrl));
 
-      // Thêm file ảnh vào request
-      request.files.add(await http.MultipartFile.fromPath('image', imagePath));
+      // Đảm bảo tên phần file đúng như yêu cầu của server
+      var multipartFile = await http.MultipartFile.fromPath('image', imagePath);
+      request.files.add(multipartFile); // Thêm file vào request
 
       print("Sending request to $raspberryPiUrl...");
       var response = await request.send();
 
       if (response.statusCode == 200) {
-        // var responseData = await response.stream.bytesToString();
-        // var result = json.decode(responseData);
-        // String _resultMessage = "Prediction: ${result['predicted_name']}";
-        // print(_resultMessage); // Hiển thị kết quả nhận diện
-        print("ok");
+        var responseData = await response.stream.bytesToString();
+        var result = json.decode(responseData);
+        print("Image uploaded successfully!");
+        String _resultMessage = "Prediction: ${result['predicted_name']}";
+        print(_resultMessage); // Hiển thị kết quả nhận diện
       } else {
         print("Request URL: $raspberryPiUrl");
         print('Error: ${response.statusCode}');
